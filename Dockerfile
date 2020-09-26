@@ -1,10 +1,15 @@
 # use ubuntu as the image OS because everyone does, I guess
 FROM ubuntu:16.04
 
+# we need wget to install miniconda
+RUN apt-get update && \
+    apt-get install -y wget && \
+    rm -rf /var/lib/apt/lists/*
+
 # make sure bash is the default shell
 # --login makes sure both .profile and .bashrc are
 # sourced.
-SHELL["/bin/bash", "--login", "-c"]
+SHELL ["/bin/bash", "--login", "-c"]
 
 # create a non-root user to run everything, for safety
 ARG username=docker_user
@@ -44,7 +49,8 @@ USER $USER
 # install miniconda
 ENV MINICONDA_VERSION 4.8.5
 ENV CONDA_DIR $HOME/miniconda3
-RUN wget --quiet https:://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh -O ~/miniconda.sh && \
+#RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh -O ~/miniconda.sh && \
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
     chmod +x ~/miniconda.sh && \
     ~/miniconda.sh -b -p $CONDA_DIR && \
     rm ~/miniconda.sh
@@ -56,8 +62,6 @@ ENV PATH=$CONDA_DIR/bin:$PATH
 RUN echo ". $CONDA_DIR/etc/profile.d/conda.sh" >> ~/.profile
 
 # make conda available from interactive shell (/bin/bash --interactive)
-shells
-
 RUN conda init bash
 
 # create project dir in home and go to it
@@ -66,7 +70,7 @@ RUN mkdir $PROJECT_DIR
 WORKDIR $PROJECT_DIR
 
 # build conda environment
-ENV ENV_PREFIX $PWD/env
+ENV ENV_PREFIX $PROJECT_DIR/env
 RUN conda update --name base --channel defaults conda && \
     conda env create --prefix $ENV_PREFIX --file /tmp/environment.yml --force && \
     conda clean --all --yes
