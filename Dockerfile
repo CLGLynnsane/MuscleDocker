@@ -36,12 +36,12 @@ RUN chown $UID:$GID /tmp/environment.yml
 # post conda env setup
 COPY postBuild.sh /usr/local/bin/
 RUN chown $UID:$GID /usr/local/bin/postBuild.sh && \
-    chmod u+x /usr/local/bin/postBuild.sh
+    chmod a+x /usr/local/bin/postBuild.sh
 
 # 
 COPY entryPoint.sh /usr/local/bin/
 RUN chown $UID:$GID /usr/local/bin/entryPoint.sh && \
-    chmod u+x /usr/local/bin/entryPoint.sh
+    chmod a+x /usr/local/bin/entryPoint.sh
 
 # start running things (as docker_user)
 USER $USER
@@ -81,7 +81,7 @@ RUN conda activate $ENV_PREFIX && \
     conda deactivate
 
 # ensure cnda env is activated at runtime
-ENTRYPOINT ["/usr/local/bin/entryPoint.sh"]
+#ENTRYPOINT ["/usr/local/bin/entryPoint.sh"]
 
 # execute our job in the form of a bash script
 # Actually, I think with RIS/Compute docker scripts, the usual job script is passed
